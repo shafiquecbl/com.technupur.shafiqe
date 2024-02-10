@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shafique/controller/category_controller.dart';
+import 'package:shafique/data/model/response/category.dart';
 import 'package:shafique/utils/colors.dart';
 import 'package:shafique/view/base/network_image.dart';
 
@@ -11,12 +14,16 @@ class SubCategoriesView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: SizedBox(
         height: 95,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: 10,
-          separatorBuilder: (context, index) => const SizedBox(width: 10),
-          itemBuilder: (context, index) => CategoryWidget(selected: index == 0),
-        ),
+        child: GetBuilder<CategoryController>(builder: (con) {
+          return ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: con.categories.first.subCategory.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 10),
+            itemBuilder: (context, index) => CategoryWidget(
+                selected: index == 0,
+                category: con.categories.first.subCategory[index]),
+          );
+        }),
       ),
     );
   }
@@ -24,7 +31,9 @@ class SubCategoriesView extends StatelessWidget {
 
 class CategoryWidget extends StatelessWidget {
   final bool selected;
-  const CategoryWidget({this.selected = false, super.key});
+  final SubCategory category;
+  const CategoryWidget(
+      {this.selected = false, required this.category, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +42,7 @@ class CategoryWidget extends StatelessWidget {
         Stack(
           children: [
             Container(
-                padding: const EdgeInsets.all(2),
+                // padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -46,8 +55,8 @@ class CategoryWidget extends StatelessWidget {
                   backgroundColor: Colors.transparent,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(32),
-                    child: const CustomNetworkImage(
-                        url: 'https://picsum.photos/200'),
+                    child: CustomNetworkImage(
+                        url: category.image, fit: BoxFit.cover),
                   ),
                 )),
             Positioned(
@@ -64,14 +73,14 @@ class CategoryWidget extends StatelessWidget {
                             : Theme.of(context).dividerColor),
                   ),
                   child: Text(
-                    1.toString(),
+                    category.products.length.toString(),
                     style: Theme.of(context).textTheme.titleSmall,
                   )),
             ),
           ],
         ),
         const SizedBox(height: 5),
-        Text("Sub Category 1", style: Theme.of(context).textTheme.titleMedium),
+        Text(category.name, style: Theme.of(context).textTheme.titleMedium),
       ],
     );
   }

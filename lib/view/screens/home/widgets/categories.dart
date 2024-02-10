@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shafique/controller/category_controller.dart';
+import 'package:shafique/data/model/response/category.dart';
 import 'package:shafique/utils/colors.dart';
 
 class CategoriesView extends StatelessWidget {
@@ -10,12 +13,15 @@ class CategoriesView extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 10),
       child: SizedBox(
         height: 42,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: 10,
-          separatorBuilder: (context, index) => const SizedBox(width: 10),
-          itemBuilder: (context, index) => CategoryWidget(selected: index == 0),
-        ),
+        child: GetBuilder<CategoryController>(builder: (con) {
+          return ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: con.categories.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 10),
+            itemBuilder: (context, index) => CategoryWidget(
+                selected: index == 0, category: con.categories[index]),
+          );
+        }),
       ),
     );
   }
@@ -23,7 +29,9 @@ class CategoriesView extends StatelessWidget {
 
 class CategoryWidget extends StatelessWidget {
   final bool selected;
-  const CategoryWidget({this.selected = false, super.key});
+  final Category category;
+  const CategoryWidget(
+      {this.selected = false, required this.category, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +48,7 @@ class CategoryWidget extends StatelessWidget {
                   color:
                       selected ? primaryColor : Theme.of(context).dividerColor),
             ),
-            child: Text("Category 1",
+            child: Text(category.name,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: selected ? primaryColor : null,
                       fontWeight: selected ? FontWeight.bold : null,
@@ -61,7 +69,7 @@ class CategoryWidget extends StatelessWidget {
                         : Theme.of(context).dividerColor),
               ),
               child: Text(
-                1.toString(),
+                category.subCategory.length.toString(),
                 style: Theme.of(context).textTheme.titleSmall,
               )),
         ),

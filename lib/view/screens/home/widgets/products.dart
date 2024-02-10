@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shafique/controller/category_controller.dart';
+import 'package:shafique/data/model/response/category.dart';
 import 'package:shafique/utils/colors.dart';
 import 'package:shafique/view/base/discount.dart';
 import 'package:shafique/view/base/network_image.dart';
@@ -39,13 +42,18 @@ class ProductsView extends StatelessWidget {
             ],
           ),
           SizedBox(
-            height: 200,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 10,
-              separatorBuilder: (context, index) => const SizedBox(width: 10),
-              itemBuilder: (context, index) => const ProductWidget(),
-            ),
+            height: 230,
+            child: GetBuilder<CategoryController>(builder: (con) {
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount:
+                    con.categories.first.subCategory.first.products.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 10),
+                itemBuilder: (context, index) => ProductWidget(
+                    product:
+                        con.categories.first.subCategory.first.products[index]),
+              );
+            }),
           ),
         ],
       ),
@@ -54,7 +62,8 @@ class ProductsView extends StatelessWidget {
 }
 
 class ProductWidget extends StatelessWidget {
-  const ProductWidget({super.key});
+  final Product product;
+  const ProductWidget({required this.product, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,31 +78,32 @@ class ProductWidget extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: const CustomNetworkImage(
-                      url: 'https://picsum.photos/200'),
+                  child: CustomNetworkImage(url: product.image),
                 ),
-                const DiscountWidget(discount: '-0.00%'),
+                DiscountWidget(
+                  discount: '${product.discountPercentage} %',
+                ),
                 const Positioned(bottom: 5, right: 5, child: WishButton()),
               ],
             ),
           ),
         ),
         const SizedBox(height: 5),
-        Text('Product Name',
+        Text(product.name,
             style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: Theme.of(context).hintColor,
                 )),
         Row(
           children: [
             Text(
-              '\$ 200',
+              '\$ ${product.price}',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).hintColor,
                     decoration: TextDecoration.lineThrough,
                   ),
             ),
             const SizedBox(width: 5),
-            Text('\$ 100',
+            Text('\$ ${product.price}',
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                       color: primaryColor,
                       fontWeight: FontWeight.bold,
